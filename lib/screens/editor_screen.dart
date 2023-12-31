@@ -18,7 +18,9 @@ class _EditorScreenState extends State<EditorScreen> {
   final String projectFolderName = "paths";
   final TextEditingController _pathNameController = TextEditingController();
   final GlobalKey<FormState> _pathNameFormKey = GlobalKey<FormState>();
+
   List<String> currentProjectFiles = [];
+  int selectedPathIndex = -1;
 
   @override
   void initState() {
@@ -45,7 +47,12 @@ class _EditorScreenState extends State<EditorScreen> {
   List<String> getProjectFiles() {
     final projectFolderPath =
         "${widget.directoryPath}/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/$projectFolderName";
-    return Directory(projectFolderPath).listSync().map((e) => e.path).toList();
+
+    return Directory(projectFolderPath)
+        .listSync()
+        .where((entity) => entity is File && entity.path.endsWith('.path'))
+        .map((file) => file.path)
+        .toList();
   }
 
   String getProjectName() {
@@ -268,12 +275,32 @@ class _EditorScreenState extends State<EditorScreen> {
     return null;
   }
 
+  String? getSelectedPathName() {
+    if (selectedPathIndex == -1) {
+      return null;
+    }
+    return extractPathNameFromFilePath(currentProjectFiles[selectedPathIndex]);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(getProjectName(),
-            style: Theme.of(context).textTheme.headlineMedium),
+        title: Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Text(getProjectName()),
+            const SizedBox(width: 8.0),
+            Visibility(
+              visible: selectedPathIndex != -1,
+              child: Text(
+                "(${getSelectedPathName() ?? ""})",
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
+            ),
+          ],
+        ),
       ),
       drawer: Drawer(
         child: ListView(
