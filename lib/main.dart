@@ -1,3 +1,4 @@
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:ftc_path_canvas/screens/welcome_screen.dart';
 
@@ -13,14 +14,9 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       title: "FTC Path Canvas",
       home: const WelcomeScreen(),
-      theme: ThemeData.dark().copyWith(
-        textTheme: const TextTheme(
-          headlineLarge: TextStyle(
-            fontSize: 48.0,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
+      theme: FlexThemeData.light(scheme: FlexScheme.material),
+      darkTheme: FlexThemeData.dark(scheme: FlexScheme.blumineBlue),
+      themeMode: ThemeMode.system,
     );
   }
 }

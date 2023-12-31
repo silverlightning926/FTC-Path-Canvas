@@ -303,15 +303,27 @@ class _EditorScreenState extends State<EditorScreen> {
         ),
       ),
       drawer: Drawer(
-        child: ListView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             DrawerHeader(
-              decoration: const BoxDecoration(
-                color: Colors.blue,
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor,
               ),
-              child: Text(
-                getProjectName(),
-                style: Theme.of(context).textTheme.headlineMedium,
+              margin: EdgeInsets.zero,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    getProjectName(),
+                    style: Theme.of(context).textTheme.headlineLarge,
+                  ),
+                  const SizedBox(height: 8.0),
+                  Text(
+                    "${currentProjectFiles.length} ${currentProjectFiles.length == 1 ? "Path" : "Paths"}",
+                    style: Theme.of(context).textTheme.labelLarge,
+                  ),
+                ],
               ),
             ),
             ListTile(
@@ -321,69 +333,86 @@ class _EditorScreenState extends State<EditorScreen> {
                 _pathNameController.clear();
                 await showCreateDialog(context);
               },
+              tileColor: Theme.of(context).primaryColorDark,
             ),
-            const Divider(),
-            for (String path in currentProjectFiles)
-              ListTile(
-                leading: const Icon(Icons.route_outlined),
-                trailing: PopupMenuButton(
-                  itemBuilder: (BuildContext context) {
-                    return const [
-                      PopupMenuItem(
-                        value: "rename",
-                        child: Row(
-                          children: [
-                            Icon(Icons.edit, size: 15.0),
-                            SizedBox(width: 10.0),
-                            Text("Rename"),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: "copy",
-                        child: Row(
-                          children: [
-                            Icon(Icons.copy, size: 15.0),
-                            SizedBox(width: 10.0),
-                            Text("Copy"),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: "delete",
-                        child: Row(
-                          children: [
-                            Icon(Icons.delete, size: 15.0),
-                            SizedBox(width: 10.0),
-                            Text("Delete"),
-                          ],
-                        ),
-                      ),
-                    ];
-                  },
-                  onSelected: (String value) async {
-                    String pathName = extractPathNameFromFilePath(path);
-
-                    _pathNameController.text = pathName;
-
-                    if (value == "rename") {
-                      await showRenameDialog(context, pathName);
-                    } else if (value == "copy") {
-                      _pathNameController.text += "_copy";
-                      await showCopyDialog(context, pathName);
-                    } else if (value == "delete") {
-                      await showDeleteDialog(context, path);
-                    }
-                  },
-                ),
-                title: Text(extractPathNameFromFilePath(path)),
-                onTap: () {
-                  setState(() {
-                    selectedPathIndex = currentProjectFiles.indexOf(path);
-                  });
-                  Navigator.of(context).pop();
+            Expanded(
+              child: ListView.builder(
+                itemCount: currentProjectFiles.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final pathName =
+                      extractPathNameFromFilePath(currentProjectFiles[index]);
+                  return ListTile(
+                    selected: selectedPathIndex == index,
+                    selectedColor: Theme.of(context).primaryColorLight,
+                    selectedTileColor: Theme.of(context).focusColor,
+                    title: Text(pathName),
+                    onTap: () {
+                      setState(() {
+                        selectedPathIndex = index;
+                      });
+                      Navigator.of(context).pop();
+                    },
+                    leading: selectedPathIndex == index
+                        ? const Icon(Icons.edit)
+                        : const Icon(Icons.route_outlined),
+                    trailing: PopupMenuButton(
+                      itemBuilder: (BuildContext context) {
+                        return [
+                          const PopupMenuItem(
+                            value: "rename",
+                            child: Row(
+                              children: [
+                                Icon(Icons.edit, size: 15.0),
+                                SizedBox(width: 10.0),
+                                Text("Rename"),
+                              ],
+                            ),
+                          ),
+                          const PopupMenuItem(
+                            value: "copy",
+                            child: Row(
+                              children: [
+                                Icon(Icons.copy, size: 15.0),
+                                SizedBox(width: 10.0),
+                                Text("Copy"),
+                              ],
+                            ),
+                          ),
+                          const PopupMenuItem(
+                            value: "delete",
+                            child: Row(
+                              children: [
+                                Icon(Icons.delete, size: 15.0),
+                                SizedBox(width: 10.0),
+                                Text("Delete"),
+                              ],
+                            ),
+                          ),
+                        ];
+                      },
+                      onSelected: (String value) async {
+                        _pathNameController.text = pathName;
+                        switch (value) {
+                          case "rename":
+                            await showRenameDialog(
+                                context, currentProjectFiles[index]);
+                            break;
+                          case "copy":
+                            _pathNameController.text += "_copy";
+                            await showCopyDialog(
+                                context, currentProjectFiles[index]);
+                            break;
+                          case "delete":
+                            await showDeleteDialog(
+                                context, currentProjectFiles[index]);
+                            break;
+                        }
+                      },
+                    ),
+                  );
                 },
               ),
+            ),
           ],
         ),
       ),
