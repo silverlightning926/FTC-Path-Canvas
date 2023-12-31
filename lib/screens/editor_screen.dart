@@ -304,15 +304,33 @@ class _EditorScreenState extends State<EditorScreen> {
                     return const [
                       PopupMenuItem(
                         value: "rename",
-                        child: Text("Rename"),
+                        child: Row(
+                          children: [
+                            Icon(Icons.edit, size: 15.0),
+                            SizedBox(width: 10.0),
+                            Text("Rename"),
+                          ],
+                        ),
                       ),
                       PopupMenuItem(
                         value: "copy",
-                        child: Text("Copy"),
+                        child: Row(
+                          children: [
+                            Icon(Icons.copy, size: 15.0),
+                            SizedBox(width: 10.0),
+                            Text("Copy"),
+                          ],
+                        ),
                       ),
                       PopupMenuItem(
                         value: "delete",
-                        child: Text("Delete"),
+                        child: Row(
+                          children: [
+                            Icon(Icons.delete, size: 15.0),
+                            SizedBox(width: 10.0),
+                            Text("Delete"),
+                          ],
+                        ),
                       ),
                     ];
                   },
