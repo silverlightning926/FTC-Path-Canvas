@@ -331,8 +331,13 @@ class _EditorScreenState extends State<EditorScreen> {
                     }
                   },
                 ),
-                title: Text(path.split("/").last),
-                onTap: () {},
+                title: Text(extractPathNameFromFilePath(path)),
+                onTap: () {
+                  setState(() {
+                    selectedPathIndex = currentProjectFiles.indexOf(path);
+                  });
+                  Navigator.of(context).pop();
+                },
               ),
           ],
         ),
